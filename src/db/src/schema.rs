@@ -5,6 +5,8 @@ pub type RunId = i32;
 pub type InvocationId = i32;
 pub type UserId = uuid::Uuid;
 pub type ProblemId = String;
+pub type ContestId = String;
+pub type RegistrationId = i32;
 
 #[derive(Serialize, Deserialize, Debug, Clone, Queryable, PartialEq, Eq)]
 pub struct Run {
@@ -94,6 +96,20 @@ pub struct NewUser {
     pub username: String,
     pub password_hash: Option<String>,
     pub groups: Vec<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, Queryable)]
+pub struct Registration {
+    pub id: RegistrationId,
+    pub user_id: UserId,
+    pub contest_id: ContestId,
+}
+
+#[derive(Insertable)]
+#[table_name = "registrations"]
+pub struct NewRegistration {
+    pub user_id: UserId,
+    pub contest_id: ContestId,
 }
 
 use diesel::sql_types::*;

@@ -1,4 +1,6 @@
-use super::{auth, misc, monitor, prelude::*, runs, schema, users, Context, Mutation, Query};
+use super::{
+    auth, contest, misc, monitor, prelude::*, runs, schema, users, Context, Mutation, Query,
+};
 
 #[juniper::object(Context = Context)]
 impl Query {
@@ -45,7 +47,7 @@ impl Query {
     }
 
     /// List contests
-    fn contests(ctx: &Context) -> ApiResult<Vec<schema::Contest>> {
+    fn contests(ctx: &Context) -> ApiResult<Vec<contest::Contest>> {
         misc::get_contests(ctx)
     }
 

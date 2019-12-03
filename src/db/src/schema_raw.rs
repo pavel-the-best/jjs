@@ -10,6 +10,16 @@ table! {
 table! {
     use super::*;
 
+    registrations (id) {
+        id -> Int4,
+        user_id -> Uuid,
+        contest_id -> Varchar,
+    }
+}
+
+table! {
+    use super::*;
+
     runs (id) {
         id -> Int4,
         toolchain_id -> Varchar,
@@ -33,10 +43,12 @@ table! {
     }
 }
 
+joinable!(registrations -> users (user_id));
 joinable!(runs -> users (user_id));
 
 allow_tables_to_appear_in_same_query!(
     invocations,
+    registrations,
     runs,
     users,
 );

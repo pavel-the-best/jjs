@@ -1,6 +1,6 @@
 use super::{
     prelude::*,
-    schema::{contest::Problem, RunId},
+    schema::{problem::Problem, RunId},
 };
 use slog_scope::debug;
 use std::path::PathBuf;

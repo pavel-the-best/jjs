@@ -1,4 +1,4 @@
-use super::{InvocationsRepo, Repo, RunsRepo, UsersRepo};
+use super::{InvocationsRepo, RegistrationsRepo, Repo, RunsRepo, UsersRepo};
 use crate::schema::*;
 use anyhow::{Context, Result};
 use diesel::{prelude::*, r2d2::ConnectionManager};
@@ -144,6 +144,26 @@ mod impl_runs {
             }
             let limit = limit.map(i64::from).unwrap_or(i64::max_value());
             Ok(query.limit(limit).load(&self.conn()?)?)
+        }
+    }
+}
+mod impl_regs {
+    use super::*;
+    use crate::schema::registrations::dsl::*;
+    impl RegistrationsRepo for DieselRepo {
+        fn reg_new(&self, reg_data: NewRegistration) -> Result<Registration> {
+            diesel::insert_into(registrations)
+                .values(&reg_data)
+                .get_result(&self.conn()?)
+                .map_err(Into::into)
+        }
+        fn reg_find(&self, reg_id: RegistrationId) -> Result<Option<Registration>> {
+            Ok(
+                registrations.filter(id.eq(reg_id))
+                .load::<Registration>(&self.conn()?)?
+                .into_iter()
+                .next()
+            )
         }
     }
 }

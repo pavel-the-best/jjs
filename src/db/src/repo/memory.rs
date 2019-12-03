@@ -1,4 +1,4 @@
-use super::{InvocationsRepo, Repo, RunsRepo, UsersRepo};
+use super::{InvocationsRepo, Repo, RunsRepo, UsersRepo, RegistrationsRepo};
 use crate::schema::*;
 use anyhow::{bail, Result};
 use std::{convert::TryFrom, sync::Mutex};
@@ -9,6 +9,7 @@ struct Data {
     runs: Vec<Option<Run>>,
     invs: Vec<Invocation>,
     users: Vec<User>,
+    regs: Vec<Registration>
 }
 
 #[derive(Debug, Default)]
@@ -159,6 +160,25 @@ impl UsersRepo for MemoryRepo {
             .find(|user| user.username == login)
             .cloned();
         Ok(res)
+    }
+}
+
+impl RegistrationsRepo for MemoryRepo {
+    fn reg_new(&self, reg_data: NewRegistration) -> Result<Registration> {
+        let mut data = self.conn.lock().unwrap();
+        let reg_id = data.regs.len() as RegistrationId;
+        let reg = Registration {
+id: reg_id,
+user_id: reg_data.user_id,
+contest_id: reg_data.contest_id
+        };
+        data.regs.push(reg.clone());
+        Ok(reg)
+    }
+
+    fn reg_find(&self, id: RegistrationId) -> Result<Option<Registration>> {
+        let data = self.conn.lock().unwrap();
+        Ok(data.regs.get(id as usize).cloned())
     }
 }
 

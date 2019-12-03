@@ -31,4 +31,9 @@ pub trait UsersRepo: Send + Sync {
     fn user_try_load_by_login(&self, login: &str) -> Result<Option<User>>;
 }
 
-pub trait Repo: RunsRepo + InvocationsRepo + UsersRepo {}
+pub trait RegistrationsRepo: Send + Sync {
+    fn reg_new(&self, reg_data: NewRegistration) -> Result<Registration>;
+    fn reg_find(&self, id: RegistrationId) -> Result<Option<Registration>>;
+}
+
+pub trait Repo: RunsRepo + InvocationsRepo + UsersRepo + RegistrationsRepo {}

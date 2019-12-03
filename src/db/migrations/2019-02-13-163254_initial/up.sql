@@ -41,13 +41,25 @@ CREATE TABLE runs
 
 CREATE UNIQUE INDEX runs_id_unique_index ON runs (id);
 
-CREATE SEQUENCE inv_id_seq START WITH 0 MINVALUE 0;
 
 -- Invocations
 
-CREATE table invocations
+CREATE SEQUENCE inv_id_seq START WITH 0 MINVALUE 0;
+
+CREATE TABLE invocations
 (
     id          unsigned_integer DEFAULT nextval('inv_id_seq') UNIQUE PRIMARY KEY NOT NULL,
     -- This is serialized `InvokeTask`. See `invoker-api` for its definition
     invoke_task bytea                                                                 NOT NULL
+);
+
+-- Registrations
+
+CREATE SEQUENCE  reg_id_seq START WITH 0 MINVALUE 0;
+
+CREATE TABLE registrations
+(
+    id unsigned_integer DEFAULT nextval('reg_id_seq') UNIQUE PRIMARY KEY NOT NULL,
+    user_id  UUID REFERENCES users(id) NOT NULL,
+    contest_id VARCHAR(100) NOT NULL
 );

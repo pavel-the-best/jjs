@@ -1,9 +1,7 @@
-pub(super) mod contest;
+pub(super) mod problem;
 
 use juniper::GraphQLObject;
 use uuid::Uuid;
-
-pub(crate) use contest::Contest;
 
 pub type ToolchainId = String;
 pub type RunId = i32;

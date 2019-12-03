@@ -1,4 +1,5 @@
 mod auth;
+mod contest;
 mod context;
 mod misc;
 mod monitor;
