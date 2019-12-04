@@ -125,6 +125,11 @@ pub struct Contest {
     /// Whether contest is visible for anonymous users
     #[serde(rename = "vis-anon")]
     pub anon_visible: bool,
+
+
+    /// Whether user must manually register on contest
+    #[serde(rename = "manual-register")]
+    pub no_auto_register: bool,
 }
 
 #[derive(Deserialize, Debug, Clone)]
