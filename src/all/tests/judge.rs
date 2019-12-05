@@ -141,3 +141,8 @@ mutation DeleteRun($runId: Int!) {
             .contains("AccessDenied")
     );
 }
+
+#[test]
+fn virtual_contests() {
+    
+}

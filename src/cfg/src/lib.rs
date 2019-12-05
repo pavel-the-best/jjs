@@ -127,9 +127,11 @@ pub struct Contest {
     pub anon_visible: bool,
 
 
-    /// Whether user must manually register on contest
-    #[serde(rename = "manual-register")]
-    pub no_auto_register: bool,
+    /// If enabled, contest is virtual
+    /// Virtual contest is started by user.
+    /// User will not be able to submit until they `takePart` in it.
+    #[serde(rename = "virtual", default)]
+    pub is_virtual: bool,
 }
 
 #[derive(Deserialize, Debug, Clone)]

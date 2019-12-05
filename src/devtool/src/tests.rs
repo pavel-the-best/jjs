@@ -16,6 +16,13 @@ pub(crate) struct TestArgs {
 
 fn run_integ_test(runner: &Runner) {
     println!("Running integration tests");
+    let ok = Command::new("cargo")
+        .arg("test")
+        .arg("--no-run")
+        .run_on(runner);
+    if !ok {
+        return;
+    }
     // TODO: hacky. Probably it can be done better.
     let out = Command::new("cargo")
         .current_dir("src/all")

@@ -61,6 +61,7 @@ impl EnvBuilder {
             unregistered_visible: false,
             anon_visible: false,
             judges: Vec::new(),
+            is_virtual: false,
         };
 
         let config = cfg::Config {
