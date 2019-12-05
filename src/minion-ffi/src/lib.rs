@@ -22,6 +22,13 @@ pub enum ErrorCode {
     Unknown,
 }
 
+#[repr(i32)]
+pub enum WaitOutcome {
+    Exited,
+    AlreadyFinished,
+    Timeout,
+}
+
 unsafe fn get_string(buf: *const c_char) -> OsString {
     use std::os::unix::ffi::OsStrExt;
     let buf = CStr::from_ptr(buf);
@@ -266,5 +273,66 @@ pub unsafe extern "C" fn minion_cp_spawn(
     let cp = ChildProcess(cp);
     let cp = Box::new(cp);
     *out = Box::into_raw(cp);
+    ErrorCode::Ok
+}
+
+/// # Safety
+/// xyu
+#[no_mangle]
+#[must_use]
+pub unsafe extern "C" fn minion_cp_wait(cp: &mut dyn minion::ChildProcess, timeout: &TimeSpec, outcome: *mut WaitOutcome) -> ErrorCode {
+    let ans = cp.wait_for_exit(std::time::Duration::new(
+        timeout.seconds.into(),
+        timeout.nanoseconds
+    ));
+    match ans {
+        Result::Ok(ans) => {
+            *outcome = match ans {
+                minion::WaitOutcome::Exited => WaitOutcome::Exited,
+                minion::WaitOutcome::AlreadyFinished => WaitOutcome::AlreadyFinished,
+                minion::WaitOutcome::Timeout => WaitOutcome::Timeout,
+            };
+            ErrorCode::Ok
+        },
+        Result::Err(_) => ErrorCode::Unknown,
+    }
+}
+
+/// # Safety
+/// xyu
+#[no_mangle]
+#[must_use]
+pub unsafe extern "C" fn minion_cp_exitcode(cp: &mut dyn minion::ChildProcess, exitcode: *mut i64) -> ErrorCode {
+    let ans = cp.get_exit_code();
+    match ans {
+        Result::Ok(ans) => {
+            *exitcode = match ans {
+                Option::Some(ans) => ans,
+                Option::None => -1,
+            };
+            ErrorCode::Ok
+        },
+        Result::Err(_) => ErrorCode::Unknown,
+    }
+}
+
+/// # Safety
+/// xyu
+#[no_mangle]
+#[must_use]
+pub unsafe extern "C" fn minion_cp_kill(cp: &mut dyn minion::ChildProcess) -> ErrorCode {
+    let ans = cp.kill();
+    match ans {
+        Result::Ok(_) => ErrorCode::Ok,
+        Result::Err(_) => ErrorCode::Unknown,
+    }
+}
+
+/// # Safety
+/// xyu
+#[no_mangle]
+#[must_use]
+pub unsafe extern "C" fn minion_cp_free(cp: *mut dyn minion::ChildProcess) -> ErrorCode {
+    mem::drop(Box::from_raw(cp));
     ErrorCode::Ok
 }
