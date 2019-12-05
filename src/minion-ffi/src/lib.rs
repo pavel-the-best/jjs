@@ -280,8 +280,8 @@ pub unsafe extern "C" fn minion_cp_spawn(
 /// xyu
 #[no_mangle]
 #[must_use]
-pub unsafe extern "C" fn minion_cp_wait(cp: &mut dyn minion::ChildProcess, timeout: &TimeSpec, outcome: *mut WaitOutcome) -> ErrorCode {
-    let ans = cp.wait_for_exit(std::time::Duration::new(
+pub unsafe extern "C" fn minion_cp_wait(cp: &mut ChildProcess, timeout: &TimeSpec, outcome: *mut WaitOutcome) -> ErrorCode {
+    let ans = cp.0.wait_for_exit(std::time::Duration::new(
         timeout.seconds.into(),
         timeout.nanoseconds
     ));
@@ -302,8 +302,8 @@ pub unsafe extern "C" fn minion_cp_wait(cp: &mut dyn minion::ChildProcess, timeo
 /// xyu
 #[no_mangle]
 #[must_use]
-pub unsafe extern "C" fn minion_cp_exitcode(cp: &mut dyn minion::ChildProcess, exitcode: *mut i64) -> ErrorCode {
-    let ans = cp.get_exit_code();
+pub unsafe extern "C" fn minion_cp_exitcode(cp: &mut ChildProcess, exitcode: *mut i64) -> ErrorCode {
+    let ans = cp.0.get_exit_code();
     match ans {
         Result::Ok(ans) => {
             *exitcode = match ans {
@@ -320,8 +320,8 @@ pub unsafe extern "C" fn minion_cp_exitcode(cp: &mut dyn minion::ChildProcess, e
 /// xyu
 #[no_mangle]
 #[must_use]
-pub unsafe extern "C" fn minion_cp_kill(cp: &mut dyn minion::ChildProcess) -> ErrorCode {
-    let ans = cp.kill();
+pub unsafe extern "C" fn minion_cp_kill(cp: &mut ChildProcess) -> ErrorCode {
+    let ans = cp.0.kill();
     match ans {
         Result::Ok(_) => ErrorCode::Ok,
         Result::Err(_) => ErrorCode::Unknown,
@@ -332,7 +332,7 @@ pub unsafe extern "C" fn minion_cp_kill(cp: &mut dyn minion::ChildProcess) -> Er
 /// xyu
 #[no_mangle]
 #[must_use]
-pub unsafe extern "C" fn minion_cp_free(cp: *mut dyn minion::ChildProcess) -> ErrorCode {
+pub unsafe extern "C" fn minion_cp_free(cp: *mut ChildProcess) -> ErrorCode {
     mem::drop(Box::from_raw(cp));
     ErrorCode::Ok
 }
