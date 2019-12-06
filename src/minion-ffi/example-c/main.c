@@ -1,4 +1,4 @@
-#include "minion-ffi.h"
+#include <jjs/minion-ffi.h>
 #include <unistd.h>
 #include "stdio.h"
 #include "assert.h"
@@ -42,17 +42,16 @@ int main() {
     struct Minion_Dominion* dominion;
     status = minion_dominion_create(backend, dopts, &dominion);
     error_check(status);
-    struct Minion_ChildProcessOptions cpopts;
-    cpopts.dominion = dominion;
-    cpopts.stdio.stdout = 1;
-    cpopts.argv = (char**) malloc(2 * sizeof(char*));
-    assert(cpopts.argv);
-    cpopts.argv[0] = "ls";
-    cpopts.argv[1] = NULL;
-    cpopts.envp = (struct Minion_EnvItem*) malloc(sizeof(struct Minion_EnvItem));
-    assert(cpopts.envp);
-    cpopts.envp[0] = ENV_ITEM_FIN;
+    struct Minion_ChildProcessOptions cpopts = {
+        .image_path = "/bin/ls",
+        .argv = (char*[2]){"ls", NULL},
+        .envp = &ENV_ITEM_FIN,
+        .stdio = {0, 1, 2},
+        .dominion = dominion,
+        .workdir = "/",
+    };
     struct Minion_ChildProcess* cp;
     status = minion_cp_spawn(backend, cpopts, &cp);
     error_check(status);
+    for(int i = 0; i < (1 << 31) - 1; i++);
 }

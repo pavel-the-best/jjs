@@ -239,14 +239,15 @@ pub unsafe extern "C" fn minion_cp_spawn(
 ) -> ErrorCode {
     let mut arguments = Vec::new();
     {
-        let p = options.argv;
+        let mut p = options.argv;
         while !(*p).is_null() {
             arguments.push(get_string(*p));
+            p = p.offset(1);
         }
     }
     let mut environment = HashMap::new();
     {
-        let p = options.envp;
+        let mut p = options.envp;
         while !(*p).name.is_null() {
             let name = get_string((*p).name);
             let value = get_string((*p).value);
@@ -254,6 +255,7 @@ pub unsafe extern "C" fn minion_cp_spawn(
                 return ErrorCode::InvalidInput;
             }
             environment.insert(name, value);
+            p = p.offset(1);
         }
     }
     let stdio = minion::StdioSpecification {
