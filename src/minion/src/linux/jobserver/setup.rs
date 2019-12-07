@@ -94,6 +94,7 @@ fn sigterm_handler_inner() -> ! {
     loop {
         unsafe {
             libc::raise(libc::SIGKILL);
+            libc::exit(9);
         }
     }
 }
