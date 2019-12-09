@@ -1,5 +1,13 @@
+#include <unistd.h>
+
 void test_tl()
 {
+    while(1);
+}
+
+void test_tl_fork()
+{
+    fork();
     while(1);
 }
 
@@ -31,6 +39,7 @@ struct test
 
 const struct test tests[] = {
     {"tl", test_tl},
+    {"tl_fork", test_tl_fork},
     {"il", test_il},
     {"abort", test_abort},
     {"return1", test_return_1},

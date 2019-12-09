@@ -91,13 +91,40 @@ pub(crate) unsafe fn cgroup_kill_all(
             continue;
         }
         let pid: Pid = pid.parse().unwrap();
-        if Some(pid) == pid_to_ignore {
+        if Some(pid) == pid_to_ignore || pid == 1 as Pid {
+            println!("pid {} is whitelisted, not killing", pid);
             continue;
         }
+        println!("cgroup_kill_all: will now kill {}", pid);
         libc::kill(pid, libc::SIGKILL);
         libc::kill(pid, libc::SIGTERM);
         libc::waitpid(pid, std::ptr::null_mut(), libc::WNOHANG);
     }
 
+    Ok(())
+}
+
+pub(crate) unsafe fn proc_kill_all(
+    chroot_path: OsString,
+    pid_to_ignore: Option<Pid>
+) -> crate::Result<()> {
+    std::process::Command::new("/bin/busybox").arg("ls").arg("/").status().unwrap();
+    std::process::Command::new("/bin/busybox").arg("ls").arg("/proc").status().unwrap();
+    for pid_d in std::fs::read_dir(format!("{}/proc", chroot_path.into_string().unwrap())).unwrap() {
+        let pid_s: String = pid_d.unwrap().file_name().into_string().unwrap();
+        println!("read from proc: {}", pid_s);
+        let pid = pid_s.parse::<Pid>();
+        match pid {
+            Ok(pid) => {
+                if Some(pid) == pid_to_ignore {
+                    continue;
+                }
+                println!("proc killing {}", pid);
+                libc::kill(pid, libc::SIGKILL);
+                libc::kill(pid, libc::SIGTERM);
+            },
+            Err(_) => {}
+        };
+    }
     Ok(())
 }

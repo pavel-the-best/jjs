@@ -222,7 +222,7 @@ unsafe fn setup_uid_mapping(sock: &mut Socket) -> crate::Result<()> {
 unsafe fn setup_time_watch(jail_options: &JailOptions) -> crate::Result<()> {
     let cpu_tl = jail_options.time_limit.as_nanos() as u64;
     let real_tl = jail_options.wall_time_limit.as_nanos() as u64;
-    observe_time(&jail_options.jail_id, cpu_tl, real_tl)
+    observe_time(&jail_options.jail_id, jail_options.isolation_root.clone().into_os_string(), cpu_tl, real_tl)
 }
 
 unsafe fn setup_expositions(options: &JailOptions, uid: Uid) {
@@ -276,7 +276,7 @@ pub(crate) unsafe fn setup(
 
 /// internal function, kills processes which used all their CPU time limit
 /// timings are given in nanoseconds
-unsafe fn cpu_time_observer(jail_id: &str, cpu_time_limit: u64, real_time_limit: u64) -> ! {
+unsafe fn cpu_time_observer(jail_id: &str, chroot_path: std::ffi::OsString, cpu_time_limit: u64, real_time_limit: u64) -> ! {
     let start = time::Instant::now();
     loop {
         libc::sleep(1);
@@ -296,7 +296,9 @@ unsafe fn cpu_time_observer(jail_id: &str, cpu_time_limit: u64, real_time_limit:
             continue;
         }
         let my_pid = process::id();
-        jail_common::cgroup_kill_all(jail_id, Some(my_pid as Pid)).unwrap();
+        println!("fucking TL, KILLING EVERYBODY!");
+        jail_common::proc_kill_all(chroot_path, Some(my_pid as Pid)).unwrap();
+        println!("DONE MURDERING");
         break;
     }
     libc::exit(0)
@@ -304,6 +306,7 @@ unsafe fn cpu_time_observer(jail_id: &str, cpu_time_limit: u64, real_time_limit:
 
 unsafe fn observe_time(
     jail_id: &str,
+    chroot_path: std::ffi::OsString,
     cpu_time_limit: u64,
     real_time_limit: u64,
 ) -> crate::Result<()> {
@@ -315,7 +318,7 @@ unsafe fn observe_time(
         .fail()?;
     }
     if fret == 0 {
-        cpu_time_observer(jail_id, cpu_time_limit, real_time_limit)
+        cpu_time_observer(jail_id, chroot_path, cpu_time_limit, real_time_limit)
     } else {
         Ok(())
     }

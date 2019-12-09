@@ -51,8 +51,9 @@ void run_test(const char* self, const char* dir, const char* param)
         .process_limit = 1,
         .memory_limit = 0x40000000,
         .isolation_root = dir,
-        .shared_directories = (struct Minion_SharedDirectoryAccess[2]){
+        .shared_directories = (struct Minion_SharedDirectoryAccess[3]){
              {SHARED_DIRECTORY_ACCESS_KIND_READONLY, self, "/me"},
+             {SHARED_DIRECTORY_ACCESS_KIND_READONLY, "/bin/busybox", "/bin/busybox"},
              {0, NULL, NULL},
         },
     }, &minion));
@@ -66,7 +67,7 @@ void run_test(const char* self, const char* dir, const char* param)
         .workdir = "/"
     }, &proc));
     Minion_WaitOutcome outcome;
-    verify_ok(minion_cp_wait(proc, &(struct Minion_TimeSpec){2, 0}, &outcome));
+    verify_ok(minion_cp_wait(proc, &(struct Minion_TimeSpec){100, 0}, &outcome));
     if(outcome == WAIT_OUTCOME_TIMEOUT)
     {
         verify_ok(minion_cp_kill(proc));

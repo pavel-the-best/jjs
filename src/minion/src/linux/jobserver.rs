@@ -248,6 +248,7 @@ unsafe fn spawn_job(
         do_exec(dea);
     }
     //parent
+    println!("minion: child pid is {}", res);
     child_pid = res;
 
     //now we can allow child to execve()
