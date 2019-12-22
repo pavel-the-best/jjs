@@ -22,6 +22,9 @@ pub struct Opts {
     /// Build sample contest (requires ppc to be available)
     #[structopt(long)]
     sample_contest: bool,
+    /// Setup users from given userlist file
+    #[structopt(long)]
+    users: Option<PathBuf>,
     /// Configure toolchains
     #[structopt(long)]
     toolchains: bool,
@@ -58,6 +61,7 @@ fn main() {
         toolchains: opts.toolchains,
         sample_contest: opts.sample_contest,
         force: opts.force,
+        users: opts.users
     };
     let runner = util::cmd::Runner::new();
     if let Err(e) = setup::setup(&params, &runner) {

@@ -78,6 +78,7 @@ pub(crate) fn task_build(opts: RawBuildOpts, runner: &Runner) ->anyhow::Result<(
             .arg("--symlink-config")
             .arg("--setup-config")
             .arg("--toolchains")
+            .arg("--users=example-config/userlist.txt")
             .run_on(runner);
     }
     Ok(())

@@ -25,6 +25,7 @@ pub struct SetupParams {
     pub sample_contest: bool,
     pub force: bool,
     pub toolchains: bool,
+    pub users: Option<PathBuf>,
 }
 
 fn add(data_dir: &Path, name: &str) -> anyhow::Result<()> {
@@ -104,8 +105,7 @@ fn setup_db(
         if let Some(host_arg) = &host_arg {
             cmd.arg(host_arg);
         }
-        cmd
-            .arg(format!("--port={}", port))
+        cmd.arg(format!("--port={}", port))
             .arg("--no-password")
             .try_exec()
             .ok();
@@ -191,6 +191,18 @@ fn setup_toolchains(params: &SetupParams) -> anyhow::Result<()> {
     Ok(())
 }
 
+fn setup_users(params: &SetupParams) -> anyhow::Result<()> {
+    if let Some(userlist_path) = &params.users {
+        info!("Creating users");
+        let userlist_bin_path = params.install_dir.join("bin/jjs-userlist");
+        let mut cmd = Command::new(userlist_bin_path);
+        cmd.arg("add");
+        cmd.arg(userlist_path);
+        cmd.try_exec()?;
+    }
+    Ok(())
+}
+
 pub fn setup(params: &SetupParams, runner: &Runner) -> anyhow::Result<()> {
     std::env::set_var("JJS_PATH", &params.install_dir);
     if let Some(data_dir) = &params.data_dir {
@@ -213,5 +225,6 @@ pub fn setup(params: &SetupParams, runner: &Runner) -> anyhow::Result<()> {
         info!("configuring toolchains");
         setup_toolchains(params)?;
     }
+    setup_users(params)?;
     Ok(())
 }
