@@ -1,2 +1,3 @@
 #!/usr/bin/env bash
-"$GO" run "program.go"
+"$GO" build program.go -o simple
+./simple
