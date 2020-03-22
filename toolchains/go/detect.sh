@@ -17,6 +17,7 @@ if [[ $(versionle "$version" "1.13") && "$version" != "1.13" ]]; then
     echo "need go at least version 1.13"
     exit 1;
 fi
+echo "$(env pwd)"
 mkdir GOPATH
 go env -w GOPATH="$(readlink -f GOPATH)"
 go env -w GOROOT=
