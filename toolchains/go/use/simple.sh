@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-$GO run "program.go"
+"$GO" run "program.go"
