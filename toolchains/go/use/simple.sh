@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
-"$GO" build program.go -o simple
+"$GO" build -o simple program.go
 ./simple
