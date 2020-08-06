@@ -4,4 +4,4 @@ RUN pip3 install -r /tmp/req.txt
 COPY . /app
 WORKDIR /app
 EXPOSE 1779
-ENTRYPOINT ["uvicorn", "main:app", "--port", "1779", "--host", "0.0.0.0"]
+CMD ["uvicorn", "main:app", "--port", "1779", "--host", "0.0.0.0"]
